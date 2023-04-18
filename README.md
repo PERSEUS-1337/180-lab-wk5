@@ -23,7 +23,7 @@ An implementation of multithreading in C by interpolating pointsi n an n x n mat
 ## How to setup
  - Must have GCC
  - Run this command:
-	 - `gcc -o a lab02-2.c -lm -pthread; ./a`
+	 - `gcc -o a lab03.c -lm -pthread; ./a`
 	 - The `-lm` enables the `<math.h>` library for use of the `ceil` and `floor` functions
      - The `-pthread` enables the `<pthread.h>` library in my machine. It may work perfectly on your machine, but my machine requires these arguments
 

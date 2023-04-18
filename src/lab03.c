@@ -11,6 +11,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sched.h>
 
 #define handle_error_en(en, msg) \
                do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
@@ -188,7 +189,7 @@ void terrain_inter(float **M, int n, int num_threads)
         args[i].n = n;
         args[i].start = i * chunk_size;
         args[i].end = (i + 1) * chunk_size;
-        args[i].core_id = (i%NUM_CORES)+1;
+        args[i].core_id = (i%NUM_CORES);
 
         // Because the matrix should include the 0th coordinate, we would have to adjust our calculation to have the last submatrix to be able to handle a second row.
         if (num_threads > 1 && i == num_threads - 1)
@@ -298,13 +299,27 @@ int main()
     // for (int i = 0; i < 3; i++)
     // {
         // printf("Run # %d\n", i+1);
-        // run_benchmark(8000, 1);
-        // run_benchmark(8000, 2);
-        // run_benchmark(8000, 4);
-        // run_benchmark(8000, 8);
-        // run_benchmark(8000, 16);
-        // run_benchmark(8000, 32);
-        // run_benchmark(8000, 64);
+        // run_benchmark(10, 1);
+        // run_benchmark(10, 2);
+        // run_benchmark(10, 4);
+        // run_benchmark(10, 8);
+        // run_benchmark(10, 16);
+        // run_benchmark(10, 32);
+        // run_benchmark(10, 64);
+        // run_benchmark(1000, 1);
+        // run_benchmark(1000, 2);
+        // run_benchmark(1000, 4);
+        // run_benchmark(1000, 8);
+        // run_benchmark(1000, 16);
+        // run_benchmark(1000, 32);
+        // run_benchmark(1000, 64);
+        run_benchmark(8000, 1);
+        run_benchmark(8000, 2);
+        run_benchmark(8000, 4);
+        run_benchmark(8000, 8);
+        run_benchmark(8000, 16);
+        run_benchmark(8000, 32);
+        run_benchmark(8000, 64);
         // run_benchmark(16000, 1);
         // run_benchmark(16000, 2);
         // run_benchmark(16000, 4);
@@ -319,13 +334,13 @@ int main()
         // run_benchmark(20000, 16);
         // run_benchmark(20000, 32);
         // run_benchmark(20000, 64);
-        run_benchmark(50000, 1);
-        run_benchmark(50000, 2);
-        run_benchmark(50000, 4);
-        run_benchmark(50000, 8);
-        run_benchmark(50000, 16);
-        run_benchmark(50000, 32);
-        run_benchmark(50000, 64);
+        // run_benchmark(50000, 1);
+        // run_benchmark(50000, 2);
+        // run_benchmark(50000, 4);
+        // run_benchmark(50000, 8);
+        // run_benchmark(50000, 16);
+        // run_benchmark(50000, 32);
+        // run_benchmark(50000, 64);
         // run_benchmark(100000, 1);
         // run_benchmark(100000, 2);
         // run_benchmark(100000, 4);
