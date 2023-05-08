@@ -1,0 +1,30 @@
+Enter [1] for User Input
+Enter [2] for auto benchmark
+>>> Enter n (for benchmark): 
+Calculating a 8000 x 8000 matrix
+Benchmark will run 3x
+Sleep for 15 seconds each run
+Run # 1
+Threads: 1, Elapsed time: 1.21950 seconds
+Threads: 2, Elapsed time: 0.63921 seconds
+Threads: 4, Elapsed time: 0.37881 seconds
+Threads: 8, Elapsed time: 0.26098 seconds
+Threads: 16, Elapsed time: 0.24925 seconds
+Threads: 32, Elapsed time: 0.22267 seconds
+Threads: 64, Elapsed time: 0.21187 seconds
+Run # 2
+Threads: 1, Elapsed time: 1.20126 seconds
+Threads: 2, Elapsed time: 0.61448 seconds
+Threads: 4, Elapsed time: 0.37699 seconds
+Threads: 8, Elapsed time: 0.23692 seconds
+Threads: 16, Elapsed time: 0.22789 seconds
+Threads: 32, Elapsed time: 0.20153 seconds
+Threads: 64, Elapsed time: 0.18939 seconds
+Run # 3
+Threads: 1, Elapsed time: 1.21733 seconds
+Threads: 2, Elapsed time: 0.61635 seconds
+Threads: 4, Elapsed time: 0.38268 seconds
+Threads: 8, Elapsed time: 0.23320 seconds
+Threads: 16, Elapsed time: 0.24041 seconds
+Threads: 32, Elapsed time: 0.19225 seconds
+Threads: 64, Elapsed time: 0.19407 seconds

@@ -17,15 +17,21 @@ An implementation of multithreading in C by interpolating pointsi n an n x n mat
  5. It can now assign threads to specific CPUs.
 
 ## Files included:
- - lab02-1.c
+ - lab03.c
  - README.md
+ - input.in
+ - run.sh
+ benchmark.sh
   
 ## How to setup
  - Must have GCC
- - Run this command:
-	 - `gcc -o a lab03.c -lm -pthread; ./a`
-	 - The `-lm` enables the `<math.h>` library for use of the `ceil` and `floor` functions
-     - The `-pthread` enables the `<pthread.h>` library in my machine. It may work perfectly on your machine, but my machine requires these arguments
+ - Run `./run.sh` in your terminal.
+    - This auto compiles the code.
+ - Run `./benchmark.sh` if you want an automated benchmarking experience.
+    - It will take in `input.in` for inputs, and output to `output.txt`
+    - Modify `input.in` using the following guidelines;
+        - 1st Line - `2`, for benchmark
+        - 2nd Line - `8000` or any size of matrix, for benchmark
 
 # Resources
 - https://www.geeksforgeeks.org/multidimensional-arrays-c-cpp/

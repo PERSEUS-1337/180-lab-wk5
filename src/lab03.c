@@ -14,7 +14,12 @@
 #include <sched.h>
 
 #define handle_error_en(en, msg) \
-               do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
+    do                           \
+    {                            \
+        errno = en;              \
+        perror(msg);             \
+        exit(EXIT_FAILURE);      \
+    } while (0)
 #define NUM_CORES 12
 
 // Resources:
@@ -89,6 +94,7 @@ int getMax(int n)
  */
 void printMatx(float **matx, int n)
 {
+    printf("\nPrint the %d x %d Matrix:\n", n-1, n-1);
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
@@ -189,7 +195,7 @@ void terrain_inter(float **M, int n, int num_threads)
         args[i].n = n;
         args[i].start = i * chunk_size;
         args[i].end = (i + 1) * chunk_size;
-        args[i].core_id = (i%NUM_CORES);
+        args[i].core_id = (i % NUM_CORES);
 
         // Because the matrix should include the 0th coordinate, we would have to adjust our calculation to have the last submatrix to be able to handle a second row.
         if (num_threads > 1 && i == num_threads - 1)
@@ -218,139 +224,190 @@ void terrain_inter(float **M, int n, int num_threads)
  */
 void run_benchmark(int n, int t)
 {
+    // Generate new RNG
     srand(time(NULL));
     n++;
 
     float **matx = createMatx(n);
     populateMatx(matx, n);
 
+    // Get start time
     struct timeval start_time, end_time;
     gettimeofday(&start_time, NULL);
 
-    // The actual interpolation
+    // Do interpolation
     terrain_inter(matx, n, t);
 
+    // Get end time
     gettimeofday(&end_time, NULL);
     long seconds = end_time.tv_sec - start_time.tv_sec;
     long micros = ((seconds * 1000000) + end_time.tv_usec) - (start_time.tv_usec);
     double elapsed_time = (double)micros / 1000000.0;
 
-    // Printing the matrix in a clean way
+    // Clean matrix print
     // printMatx(matx, n);
 
     printf("Threads: %i, Elapsed time: %.5f seconds\n", t, elapsed_time);
+
+    // Free memory
+    destroyMatx(matx);
+}
+
+void benchmark_input()
+{
+    // Matrix size input
+    int n = 0, sleep_sec = 30;
+    printf("Enter n (for benchmark): ");
+    int check = scanf("%d", &n);
+
+    /*
+    Input checker on:
+    - if no input
+    - if n <= 9
+    - if n not divisible by 10
+    */
+    while (!check || n <= 9 || n % 10 != 0)
+    {
+        printf("Wrong Input! Try again: ");
+        check = scanf("%d", &n);
+    }
+
+    printf("\nCalculating a %d x %d matrix\nBenchmark will run 3x\nSleep for %d seconds each run\n", n, n, sleep_sec);
+    
+    for (int i = 0; i < 3; i++)
+    {
+        printf("Run # %d\n", i + 1);
+        for (int j = 1; j <= 64; j *= 2)
+        {
+            run_benchmark(n, j);
+
+            // Sleep after every run
+            // printf("...Sleep for %d seconds...\n", sleep_sec);
+            // sleep(sleep_sec);
+
+        }
+        // if (i == 2)
+        //     break;
+
+        // // Sleep after every run
+        // int sleep_sec = 30;
+        // for (sleep_sec; sleep_sec >= 1; sleep_sec--)
+        // {
+        //     sleep(1);
+        // }
+    }
+
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     printf("Run # %d\n", i + 1);
+    //     run_benchmark(n, 1);
+    //     run_benchmark(n, 2);
+    //     run_benchmark(n, 4);
+    //     run_benchmark(n, 8);
+    //     run_benchmark(n, 16);
+    //     run_benchmark(n, 32);
+    //     run_benchmark(n, 64);
+
+    //     if (i == 2) break;
+
+    //     // Sleep after every run
+    //     int sleep_sec = 30;
+    //     for (sleep_sec; sleep_sec >= 1; sleep_sec--)
+    //     {
+    //         sleep(1);
+    //     }
+    // }
+}
+
+void user_input()
+{
+    // Matrix size input
+    int n = 0, t = 0;
+    printf("Enter n divisible by 10: ");
+    int check = scanf("%d", &n);
+
+    /*
+    Input checker on:
+    - if no input
+    - if n <= 9
+    - if n not divisible by 10
+    */
+    while (!check || n <= 9 || n % 10 != 0)
+    {
+        printf("Wrong Input! Try again: ");
+        check = scanf("%d", &n);
+    }
+
+    // Thread number input
+    printf("Enter t that can divide n: ");
+    check = scanf("%d", &t);
+
+    /*
+    Input checker on:
+    - if no input
+    - if n is not divisible by t
+    - if t < 1
+    */
+    while (!check || n % t != 0 || t < 1)
+    {
+        printf("Wrong Input! Try again: ");
+        check = scanf("%d", &t);
+    }
+
+    // +1 to include 10th coord
+    n++;
+
+    // Generate new RNG
+    srand(time(NULL));
+
+    // Create and Populate Matrix
+    float **matx = createMatx(n);
+    populateMatx(matx, n);
+
+    // Get start time
+    struct timeval start_time, end_time;
+    gettimeofday(&start_time, NULL);
+
+    // Do interpolation
+    terrain_inter(matx, n, t);
+
+    // Get end time
+    gettimeofday(&end_time, NULL);
+    long seconds = end_time.tv_sec - start_time.tv_sec;
+    long micros = ((seconds * 1000000) + end_time.tv_usec) - (start_time.tv_usec);
+    double elapsed_time = (double)micros / 1000000.0;
+
+    // Clean matrix print
+    // printMatx(matx, n);
+    // printMatx(matx, n);
+
+    printf("\nElapsed time: %.5f seconds\n", elapsed_time);
 
     destroyMatx(matx);
 }
 
 int main()
 {
-    // // This first part of the code is for using the code with inputs
-    // int n = 0, t = 0;
-    // printf("Enter n divisible by 10: ");
-    // int check = scanf("%d", &n);
+    // Matrix size input
+    int n = 0;
+    printf("Enter [1] for User Input\nEnter [2] for auto benchmark\n>>> ");
+    int check = scanf("%d", &n);
 
-    // while (!check || n <= 9 || n % 10 != 0)
-    // {
-    //     printf("Wrong Input! Try again: ");
-    //     check = scanf("%d", &n);
-    // }
+    /*
+    Input checker on:
+    - if no input
+    - if n <= 9
+    - if n not divisible by 10
+    */
+    while (!check || n > 2 || n < 1)
+    {
+        printf("Wrong Input! Try again\n>>> ");
+        check = scanf("%d", &n);
+    }
+    if (n == 1)
+        user_input();
+    else
+        benchmark_input();
 
-    // printf("Enter t that can divide n: ");
-    // check = scanf("%d", &t);
-
-    // while (!check || n % t != 0 || t < 1)
-    // {
-    //     printf("Wrong Input! Try again: ");
-    //     check = scanf("%d", &t);
-    // }
-    // // +1 to include the actual 10th coordinate
-    // n++;
-
-    // // Reinitializes the randomizer for C
-    // srand(time(NULL));
-
-    // float **matx = createMatx(n);
-    // populateMatx(matx, n);
-
-    // // This time measurement is different from  my first 2 implementations, but fundamentally results the same numbers. I have tested the times that they measure on both my non-threaded with the original clock function, and this new threaded program with a new time function and they are within margins.
-    // // The reason for this is that for the first clock measurement implementation, it measures also the CPU Clock Cycles that the threeds have used in the smaller amount of time, resulting in inconsistencies of data output.
-    // struct timeval start_time, end_time;
-    // gettimeofday(&start_time, NULL);
-
-    // // The actual interpolation
-    // terrain_inter(matx, n, t);
-
-    // gettimeofday(&end_time, NULL);
-    // long seconds = end_time.tv_sec - start_time.tv_sec;
-    // long micros = ((seconds * 1000000) + end_time.tv_usec) - (start_time.tv_usec);
-    // double elapsed_time = (double)micros / 1000000.0;
-
-    // // Printing the matrix in a clean way
-    // // printMatx(matx, n);
-
-    // printf("\nElapsed time: %.5f seconds\n", elapsed_time);
-
-    // destroyMatx(matx);
-
-    // ==============================================================
-    // This part of the code is for the benchmarking for lab03
-    // printf("Calculating an 8000x8000 matrix\n");
-    // for (int i = 0; i < 3; i++)
-    // {
-        // printf("Run # %d\n", i+1);
-        // run_benchmark(10, 1);
-        // run_benchmark(10, 2);
-        // run_benchmark(10, 4);
-        // run_benchmark(10, 8);
-        // run_benchmark(10, 16);
-        // run_benchmark(10, 32);
-        // run_benchmark(10, 64);
-        // run_benchmark(1000, 1);
-        // run_benchmark(1000, 2);
-        // run_benchmark(1000, 4);
-        // run_benchmark(1000, 8);
-        // run_benchmark(1000, 16);
-        // run_benchmark(1000, 32);
-        // run_benchmark(1000, 64);
-        run_benchmark(8000, 1);
-        run_benchmark(8000, 2);
-        run_benchmark(8000, 4);
-        run_benchmark(8000, 8);
-        run_benchmark(8000, 16);
-        run_benchmark(8000, 32);
-        run_benchmark(8000, 64);
-        // run_benchmark(16000, 1);
-        // run_benchmark(16000, 2);
-        // run_benchmark(16000, 4);
-        // run_benchmark(16000, 8);
-        // run_benchmark(16000, 16);
-        // run_benchmark(16000, 32);
-        // run_benchmark(16000, 64);
-        // run_benchmark(20000, 1);
-        // run_benchmark(20000, 2);
-        // run_benchmark(20000, 4);
-        // run_benchmark(20000, 8);
-        // run_benchmark(20000, 16);
-        // run_benchmark(20000, 32);
-        // run_benchmark(20000, 64);
-        // run_benchmark(50000, 1);
-        // run_benchmark(50000, 2);
-        // run_benchmark(50000, 4);
-        // run_benchmark(50000, 8);
-        // run_benchmark(50000, 16);
-        // run_benchmark(50000, 32);
-        // run_benchmark(50000, 64);
-        // run_benchmark(100000, 1);
-        // run_benchmark(100000, 2);
-        // run_benchmark(100000, 4);
-        // run_benchmark(100000, 8);
-        // run_benchmark(100000, 16);
-        // run_benchmark(100000, 32);
-        // run_benchmark(100000, 64);
-        //     printf("Sleep for 10 seconds\n");
-        //     sleep(10);
-        // }
-
-        return 0;
+    return 0;
 }
