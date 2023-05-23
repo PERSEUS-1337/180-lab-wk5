@@ -60,9 +60,19 @@ float **createMatx(int n)
  *
  * @param matx The matrix to be destroyed.
  */
-void destroyMatx(float **matx)
+void destroyMatx(float **matx, int n)
 {
-    free(*matx);
+    // Old implementation
+    // free(*matx);
+    // free(matx);
+
+    // New Implementation
+    // Free mem of each row
+    for (int i = 0; i<n; ++i)
+    {
+        free(matx[i]);
+    }
+    // Free mem of array of row pointers
     free(matx);
 }
 
@@ -135,12 +145,16 @@ void *thread_func(void *arg)
 
     // cpu_set_t: This data set is a bitset where each bit represents a CPU.
     cpu_set_t cpuset;
-    // CPU_ZERO: This macro initializes the CPU set set to be the empty set.
+    // CPU_ZERO: This macro initializes the CPU set to be the empty set.
     CPU_ZERO(&cpuset);
-    // CPU_SET: This macro adds cpu to the CPU set set.
+    // CPU_SET: This macro adds cpu to the CPU set.
     CPU_SET(core_id, &cpuset);
 
-    pthread_setaffinity_np(pid, sizeof(cpu_set_t), &cpuset);
+    const int set_result = pthread_setaffinity_np(pid, sizeof(cpu_set_t), &cpuset);
+
+    // Comment out code below to see results
+    // const int get_affinity = pthread_getaffinity_np(pid, sizeof(cpu_set_t), &cpuset);
+    // printf("core_id: %d, set_result: %d, get_affinity: %d\n", core_id, set_result, get_affinity);
 
     for (int i = args->start; i < args->end; i++)
     {
@@ -250,13 +264,13 @@ void run_benchmark(int n, int t)
     printf("Threads: %i, Elapsed time: %.5f seconds\n", t, elapsed_time);
 
     // Free memory
-    destroyMatx(matx);
+    destroyMatx(matx, n);
 }
 
 void benchmark_input()
 {
     // Matrix size input
-    int n = 0, sleep_sec = 30;
+    int n = 0, sleep_sec = 0;
     printf("Enter n (for benchmark): ");
     int check = scanf("%d", &n);
 
@@ -280,43 +294,17 @@ void benchmark_input()
         for (int j = 1; j <= 64; j *= 2)
         {
             run_benchmark(n, j);
-
-            // Sleep after every run
-            // printf("...Sleep for %d seconds...\n", sleep_sec);
-            // sleep(sleep_sec);
-
         }
-        // if (i == 2)
-        //     break;
 
-        // // Sleep after every run
-        // int sleep_sec = 30;
-        // for (sleep_sec; sleep_sec >= 1; sleep_sec--)
-        // {
-        //     sleep(1);
-        // }
+        // Sleep after every run
+        if (i == 2)
+            break;
+        if (sleep_sec)
+        {
+            printf("...Sleep for %d seconds...\n", sleep_sec);
+            sleep(sleep_sec);
+        }
     }
-
-    // for (int i = 0; i < 3; i++)
-    // {
-    //     printf("Run # %d\n", i + 1);
-    //     run_benchmark(n, 1);
-    //     run_benchmark(n, 2);
-    //     run_benchmark(n, 4);
-    //     run_benchmark(n, 8);
-    //     run_benchmark(n, 16);
-    //     run_benchmark(n, 32);
-    //     run_benchmark(n, 64);
-
-    //     if (i == 2) break;
-
-    //     // Sleep after every run
-    //     int sleep_sec = 30;
-    //     for (sleep_sec; sleep_sec >= 1; sleep_sec--)
-    //     {
-    //         sleep(1);
-    //     }
-    // }
 }
 
 void user_input()
@@ -383,7 +371,7 @@ void user_input()
 
     printf("\nElapsed time: %.5f seconds\n", elapsed_time);
 
-    destroyMatx(matx);
+    destroyMatx(matx, n);
 }
 
 int main()
