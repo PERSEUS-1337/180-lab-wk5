@@ -42,3 +42,4 @@ An implementation of multithreading in C by interpolating pointsi n an n x n mat
 - https://bytefreaks.net/programming-2/cc-set-affinity-to-threads-example-code
 - https://stackoverflow.com/questions/1407786/how-to-set-cpu-affinity-of-a-particular-pthread
 - https://man7.org/linux/man-pages/man3/CPU_SET.3.html
+- https://www.sciencedirect.com/science/article/pii/S0167819198000210
